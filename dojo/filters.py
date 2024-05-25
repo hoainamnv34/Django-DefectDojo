@@ -2477,7 +2477,7 @@ class QuestionTypeFilter(ChoiceFilter):
         return self.options[value][1](self, qs, self.options[value][0])
 
 
-with warnings.catch_warnings(action="ignore", category=ManagerInheritanceWarning):
+with warnings.catch_warnings():
     class QuestionFilter(FilterSet):
         text = CharFilter(lookup_expr='icontains')
         type = QuestionTypeFilter()

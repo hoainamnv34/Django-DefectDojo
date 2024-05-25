@@ -30,7 +30,7 @@ from dojo.forms import CheckForm, \
     CredMappingForm, JIRAEngagementForm, JIRAImportScanForm, TypedNoteForm, JIRAProjectForm, \
     EditRiskAcceptanceForm
 
-from dojo.models import Finding, Product, Engagement, Test, \
+from dojo.models import EngEvaluate, Finding, Product, Engagement, Test, \
     Check_List, Test_Import, Notes, \
     Risk_Acceptance, Development_Environment, Endpoint, \
     Cred_Mapping, System_Settings, Note_Type, Product_API_Scan_Configuration
@@ -426,11 +426,25 @@ class ViewEngagement(View):
 
         add_breadcrumb(parent=eng, top_level=False, request=request)
 
+
+
+        # Tạo một EngEvaluate mới
+        evaluation = EngEvaluate.objects.create(
+            critical_point=5,  # Điểm cho loại findings critical
+            high_point=3,      # Điểm cho loại findings high
+            medium_point=2,    # Điểm cho loại findings medium
+            low_point=1,       # Điểm cho loại findings low
+            initial_points=20  # Số điểm ban đầu của engagement
+        )
+
+        eng.eng_evaluate = evaluation
+
         title = ""
         if eng.engagement_type == "CI/CD":
             title = " CI/CD"
         product_tab = Product_Tab(prod, title="View" + title + " Engagement", tab="engagements")
         product_tab.setEngagement(eng)
+
         return render(
             request, self.get_template(), {
                 'eng': eng,

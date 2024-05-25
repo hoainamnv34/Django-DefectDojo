@@ -3283,7 +3283,7 @@ class CreateQuestionnaireForm(forms.ModelForm):
         exclude = ['questions']
 
 
-with warnings.catch_warnings(action="ignore", category=ManagerInheritanceWarning):
+with warnings.catch_warnings():
     class EditQuestionnaireQuestionsForm(forms.ModelForm):
         questions = forms.ModelMultipleChoiceField(
             Question.polymorphic.all(),

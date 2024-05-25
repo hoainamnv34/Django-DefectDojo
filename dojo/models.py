@@ -1366,6 +1366,31 @@ ENGAGEMENT_STATUS_CHOICES = (('Not Started', 'Not Started'),
                              ('Waiting for Resource', 'Waiting for Resource'))
 
 
+class EngEvaluate(models.Model):
+    critical_point = models.IntegerField(
+        null=True, blank=True, verbose_name='Critical Point',
+        help_text='Points for critical findings')
+    high_point = models.IntegerField(
+        null=True, blank=True, verbose_name='High Point',
+        help_text='Points for high findings')
+    medium_point = models.IntegerField(
+        null=True, blank=True, verbose_name='Medium Point',
+        help_text='Points for medium findings')
+    low_point = models.IntegerField(
+        null=True, blank=True, verbose_name='Low Point',
+        help_text='Points for low findings')
+    initial_points = models.IntegerField(
+        null=True, blank=True, verbose_name='Initial Points',
+        help_text='Initial points for the engagement')
+
+    class Meta:
+        verbose_name = 'Engagement Evaluation'
+        verbose_name_plural = 'Engagement Evaluations'
+
+    def __str__(self):
+        return f"EngEvaluate (Critical: {self.critical_point}, High: {self.high_point}, Medium: {self.medium_point}, Low: {self.low_point})"
+
+
 class Engagement(models.Model):
     name = models.CharField(max_length=300, null=True, blank=True)
     description = models.CharField(max_length=2000, null=True, blank=True)
@@ -1420,6 +1445,9 @@ class Engagement(models.Model):
 
     tags = TagField(blank=True, force_lowercase=True, help_text=_("Add tags that help describe this engagement. Choose from the list or add new tags. Press Enter key to add."))
     inherited_tags = TagField(blank=True, force_lowercase=True, help_text=_("Internal use tags sepcifically for maintaining parity with product. This field will be present as a subset in the tags field"))
+
+    eng_evaluate = models.OneToOneField(EngEvaluate, null=True, blank=True, on_delete=models.SET_NULL, help_text="Evaluation details of the engagement")
+
 
     class Meta:
         ordering = ['-target_start']
@@ -1513,6 +1541,42 @@ class Engagement(models.Model):
         # get a copy of the tags to be inherited
         incoming_inherited_tags = [tag.name for tag in self.product.tags.all()]
         _manage_inherited_tags(self, incoming_inherited_tags, potentially_existing_tags=potentially_existing_tags)
+
+
+    def evaluate_cicd_result(self):
+        """
+        Evaluate the result of CI/CD engagement based on initial points and points deducted from findings.
+        Return True if successful, False otherwise.
+        """
+        if not self.eng_evaluate:
+            return True
+        
+        
+        # Get initial_points from  EngEvaluate
+        initial_points = self.eng_evaluate.initial_points 
+        findings_points = 0
+        
+        # Lấy số lượng của các loại findings
+        critical_findings_count = self.unaccepted_open_findings.filter(severity="Critical").count()
+        high_findings_count = self.unaccepted_open_findings.filter(severity="High").count()
+        medium_findings_count = self.unaccepted_open_findings.filter(severity="Medium").count()
+        low_findings_count = self.unaccepted_open_findings.filter(severity="Low").count()
+        
+        # Tính điểm từ các loại findings
+        findings_points += critical_findings_count * (self.eng_evaluate.critical_point or 0)
+        findings_points += high_findings_count * (self.eng_evaluate.high_point or 0)
+        findings_points += medium_findings_count * (self.eng_evaluate.medium_point or 0)
+        findings_points += low_findings_count * (self.eng_evaluate.low_point or 0)
+        
+        # Tính tổng số điểm cuối cùng
+        total_points = initial_points - findings_points
+
+        # Đánh giá kết quả
+        if total_points >= 0:
+            return True
+        else:
+            return False
+
 
 
 class CWE(models.Model):
@@ -4362,7 +4426,7 @@ class Benchmark_Product_Summary(models.Model):
 # ==========================
 # Defect Dojo Engaegment Surveys
 # ==============================
-with warnings.catch_warnings(action="ignore", category=ManagerInheritanceWarning):
+with warnings.catch_warnings():
     class Question(PolymorphicModel, TimeStampedModel):
         '''
             Represents a question.
@@ -4494,7 +4558,7 @@ class General_Survey(models.Model):
         return self.survey.name
 
 
-with warnings.catch_warnings(action="ignore", category=ManagerInheritanceWarning):
+with warnings.catch_warnings():
     class Answer(PolymorphicModel, TimeStampedModel):
         ''' Base Answer model
         '''

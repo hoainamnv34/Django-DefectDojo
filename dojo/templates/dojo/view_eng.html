@@ -186,6 +186,34 @@
                     </div>
                 </div>
             {% endif %}
+
+            {% if eng.engagement_type == "CI/CD" %}
+                <div class="row">
+                    <div id="evaluate" class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4> Evaluate CI/CD Pipeline
+                                    {% if eng|has_object_permission:"Risk_Acceptance" %}
+                                        <a title=" Evaluate CI/CD Pipeline..." class="pull-right btn btn-sm btn-primary"
+                                            href="{% url 'add_risk_acceptance' eng.id %}?return_url={{ request.get_full_path|urlencode }}"><span class="fa-solid fa-plus"></span></a>
+                                        </a>
+                                    {% endif %}
+                                </h4>
+                            </div>
+                             {% if risks_accepted %}
+                                <div> 
+                                    hi testttt
+                                </div>
+                            {% else %} 
+                                <div class="panel-body">
+                                    <small class="text-muted"><em>Evaluate CI/CD Pipeline found.</em></small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
             <div class="row">
                 <div id="tests" class="col-md-12">
                     <div class="panel panel-default">
@@ -365,6 +393,8 @@
                     </div>
                 </div>
             </div>
+
+
             <div class="row">
                 <div id="risk" class="col-md-12">
                     <div class="panel panel-default">
@@ -458,6 +488,7 @@
                 </div>
             </div>
             {% block global_risk_acceptances %}{% endblock %}
+            
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4>Additional Features<span class="pull-right"><a name="collapsible" data-toggle="collapse" href="#add_feat">
@@ -916,6 +947,43 @@
                         </div>
                     </div>
                 </div>
+
+                <div>
+                    <div class="panel panel-default-secondary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><span class="fa-solid fa-server" aria-hidden="true"></span>
+                                Evaluate CI/CD Pipeline
+                            </h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 150px;"><strong>Initial Point</strong></td>
+                                        <td>{{ eng.eng_evaluate.initial_points|notspecified }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 150px;"><strong>Critical Point</strong></td>
+                                        <td>{{ eng.eng_evaluate.critical_point|notspecified }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>High Point</strong></td>
+                                        <td>{{ eng.eng_evaluate.high_point|notspecified}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Medium Point</strong></td>
+                                        <td>{{ eng.eng_evaluate.medium_point|notspecified }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Low Point</strong></td>
+                                        <td>{{ eng.eng_evaluate.low_point|notspecified }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             {% endif %}
             {% if system_settings.enable_credentials %}
                 <div>
