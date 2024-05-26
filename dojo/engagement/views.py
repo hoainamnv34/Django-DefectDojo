@@ -30,7 +30,7 @@ from dojo.forms import CheckForm, \
     CredMappingForm, JIRAEngagementForm, JIRAImportScanForm, TypedNoteForm, JIRAProjectForm, \
     EditRiskAcceptanceForm
 
-from dojo.models import EngEvaluate, Finding, Product, Engagement, Test, \
+from dojo.models import Engagement_Evaluate, Finding, Product, Engagement, Test, \
     Check_List, Test_Import, Notes, \
     Risk_Acceptance, Development_Environment, Endpoint, \
     Cred_Mapping, System_Settings, Note_Type, Product_API_Scan_Configuration
@@ -427,17 +427,9 @@ class ViewEngagement(View):
         add_breadcrumb(parent=eng, top_level=False, request=request)
 
 
-
-        # Tạo một EngEvaluate mới
-        evaluation = EngEvaluate.objects.create(
-            critical_point=5,  # Điểm cho loại findings critical
-            high_point=3,      # Điểm cho loại findings high
-            medium_point=2,    # Điểm cho loại findings medium
-            low_point=1,       # Điểm cho loại findings low
-            initial_points=20  # Số điểm ban đầu của engagement
-        )
-
-        eng.eng_evaluate = evaluation
+        evaluate_result = eng.evaluate_cicd_result()
+        threshold = eng.get_threshold()
+        finds_points = eng.get_finds_ponts()
 
         title = ""
         if eng.engagement_type == "CI/CD":
@@ -463,7 +455,10 @@ class ViewEngagement(View):
                 'creds': creds,
                 'cred_eng': cred_eng,
                 'network': network,
-                'preset_test_type': preset_test_type
+                'preset_test_type': preset_test_type,
+                'evaluate_result': evaluate_result,
+                'threshold': threshold,
+                'finds_points': finds_points
             })
 
     def post(self, request, eid, *args, **kwargs):

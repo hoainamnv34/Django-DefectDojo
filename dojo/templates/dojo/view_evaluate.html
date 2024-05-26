@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load navigation_tags %}
+{% load get_config_setting %}
+{% block content %}
+    {{ block.super }}
+    <div class="row">
+      <div class="col-md-12">
+          <div class="panel panel-default table-responsive">
+              <div class="panel-heading">
+                  <h4>CI/CD Engagement Evaluation
+                      <a title="Add New Engagement Evaluate" class="pull-right btn btn-primary btn-sm"
+                         href="{% url 'add_engagement_evaluate' prod.id %}"><span class="fa-solid fa-plus"></span></a>
+                  </h4>
+              </div>
+              {% if evaluates %}
+                  <table class="tablesorter-bootstrap table table-condensed table-striped table-hover">
+                      <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Threshold Point</th>
+                        <th>Critical Point</th>
+                        <th>High Point</th>
+                        <th>Medium Point</th>
+                        <th>Low Point</th>
+                        <th></th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {% for evaluate in evaluates %}
+                          <tr>
+                            <td>
+                              {{ evaluate.name }}
+                            </td>
+                            <td>
+                              {{ evaluate.threshold }}
+                            </td> 
+                            <td>
+                              {{ evaluate.critical_point }}
+                            </td>
+                            <td>
+                              {{ evaluate.high_point }}
+                            </td>
+                            <td>
+                              {{ evaluate.medium_point }}
+                            </td>
+                            <td>
+                              {{ evaluate.low_point }}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a class="btn btn-sm btn-warning"
+                                       href="{% url 'edit_engagement_evaluate' evaluate.product.id evaluate.id  %}">Edit</a>
+                                    <a class="btn btn-sm btn-danger delete-finding"
+                                       href="{% url 'delete_engagement_evaluate' evaluate.product.id evaluate.id  %}">Delete</a>
+                                </div>
+                            </td> 
+                          </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+              {% else %}
+                  <div class="panel-body">
+                      <p>No engagement evaluation found.</p>
+                  </div>
+              {% endif %} 
+          </div>
+      </div>
+    </div>
+{% endblock %}

@@ -192,23 +192,22 @@
                     <div id="evaluate" class="col-md-12">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h4> Evaluate CI/CD Pipeline
-                                    {% if eng|has_object_permission:"Risk_Acceptance" %}
-                                        <a title=" Evaluate CI/CD Pipeline..." class="pull-right btn btn-sm btn-primary"
-                                            href="{% url 'add_risk_acceptance' eng.id %}?return_url={{ request.get_full_path|urlencode }}"><span class="fa-solid fa-plus"></span></a>
-                                        </a>
-                                    {% endif %}
-                                </h4>
+                                <h4> Evaluate CI/CD Pipeline</h4>
                             </div>
-                             {% if risks_accepted %}
-                                <div> 
-                                    hi testttt
-                                </div>
-                            {% else %} 
-                                <div class="panel-body">
-                                    <small class="text-muted"><em>Evaluate CI/CD Pipeline found.</em></small>
-                                </div>
-                            {% endif %}
+                            <div class="panel-body">
+                                {% if eng.engagement_evaluate %}
+                                    {% if evaluate_result %}
+                                        CI/CD Pipeline Successful
+                                    {% else %} 
+                                        CI/CD Pipeline failed 
+                                    {% endif %}
+                                    <div> </div>
+                                    <small class="text-muted"><em>Threshold: {{ threshold }}</em></small>
+                                    <small class="text-muted"><em>Finds Points: {{ finds_points }}</em></small>
+                                {% else %} 
+                                    <small class="text-muted"><em>No Evaluate CI/CD Pipeline found.</em></small>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -952,31 +951,35 @@
                     <div class="panel panel-default-secondary">
                         <div class="panel-heading">
                             <h3 class="panel-title"><span class="fa-solid fa-server" aria-hidden="true"></span>
-                                Evaluate CI/CD Pipeline
+                                CI/CD Engagement Evaluation
                             </h3>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <tbody>
                                     <tr>
-                                        <td style="width: 150px;"><strong>Initial Point</strong></td>
-                                        <td>{{ eng.eng_evaluate.initial_points|notspecified }}</td>
+                                        <td style="width: 150px;"><strong>Name</strong></td>
+                                        <td>{{ eng.engagement_evaluate.name|notspecified }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 150px;"><strong>Threshold Point</strong></td>
+                                        <td>{{ eng.engagement_evaluate.threshold|notspecified }}</td>
                                     </tr>
                                     <tr>
                                         <td style="width: 150px;"><strong>Critical Point</strong></td>
-                                        <td>{{ eng.eng_evaluate.critical_point|notspecified }}</td>
+                                        <td>{{ eng.engagement_evaluate.critical_point|notspecified }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>High Point</strong></td>
-                                        <td>{{ eng.eng_evaluate.high_point|notspecified}}</td>
+                                        <td>{{ eng.engagement_evaluate.high_point|notspecified}}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Medium Point</strong></td>
-                                        <td>{{ eng.eng_evaluate.medium_point|notspecified }}</td>
+                                        <td>{{ eng.engagement_evaluate.medium_point|notspecified }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Low Point</strong></td>
-                                        <td>{{ eng.eng_evaluate.low_point|notspecified }}</td>
+                                        <td>{{ eng.engagement_evaluate.low_point|notspecified }}</td>
                                     </tr>
                                 </tbody>
                             </table>

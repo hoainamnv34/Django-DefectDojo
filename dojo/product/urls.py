@@ -51,6 +51,19 @@ urlpatterns = [
         name='add_engagement_presets'),
     re_path(r'^product/(?P<pid>\d+)/engagement_presets/(?P<eid>\d+)/delete$', views.delete_engagement_presets,
         name='delete_engagement_presets'),
+    
+
+    # add
+    re_path(r'^product/(?P<pid>\d+)/engagement_evaluate$', views.engagement_evaluate,
+        name='engagement_evaluate'),
+    re_path(r'^product/(?P<pid>\d+)/engagement_evaluate/(?P<eid>\d+)/edit$', views.edit_engagement_evaluate,
+        name='edit_engagement_evaluate'),
+    re_path(r'^product/(?P<pid>\d+)/engagement_evaluate/add$', views.add_engagement_evaluate,
+        name='add_engagement_evaluate'),
+    re_path(r'^product/(?P<pid>\d+)/engagement_evaluate/(?P<eid>\d+)/delete$', views.delete_engagement_evaluate,
+        name='delete_engagement_evaluate'),
+    # add 
+    
     re_path(r'^product/(?P<pid>\d+)/add_member$', views.add_product_member,
         name='add_product_member'),
     re_path(r'^product/member/(?P<memberid>\d+)/edit$', views.edit_product_member,

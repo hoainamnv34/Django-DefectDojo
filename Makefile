@@ -5,3 +5,9 @@ stop_build_run:
 
 migration:
 	python manage.py makemigrations
+
+pgadmin:
+	docker run -p 32180:80     \
+	-e 'PGADMIN_DEFAULT_EMAIL=hoainam.nv34@gmail.com' \
+	-e 'PGADMIN_DEFAULT_PASSWORD=123456a@' \
+	-d dpage/pgadmin4

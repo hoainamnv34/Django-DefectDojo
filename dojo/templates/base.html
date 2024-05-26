@@ -941,6 +941,22 @@
                                                                 {% trans "View Engagement Presets" %}
                                                             </a>
                                                         </li>
+
+                                                        {% comment %} add {% endcomment %}
+                                                        <li role="separator" class="divider"></li>
+                                                        <li role="presentation">
+                                                            <a href="{% url 'add_engagement_evaluate' product_tab.product.id %}">
+                                                                <i class="fa-solid fa-plus"></i>
+                                                                {% trans "Add CI/CD Engagement Evaluation" %}
+                                                            </a>
+                                                        </li>
+                                                        <li role="presentation">
+                                                            <a href="{% url 'engagement_evaluate' product_tab.product.id %}">
+                                                                <i class="fa-solid fa-rectangle-list"></i>
+                                                                {% trans "View CI/CD Engagement Evaluation" %}
+                                                            </a>
+                                                        </li>
+                                                        {% comment %} add {% endcomment %}
                                                         <li role="separator" class="divider"></li>
                                                         <li role="presentation">
                                                             <a href="{% url 'action_history' product_tab.product|content_type product_tab.product.id %}">

@@ -3,7 +3,7 @@ import logging
 
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from dojo.models import Engagement
+from dojo.models import Engagement, Engagement_Evaluate
 import dojo.jira_link.helper as jira_helper
 
 logger = logging.getLogger(__name__)
@@ -28,3 +28,4 @@ def reopen_engagement(eng):
 def set_name_if_none(sender, instance, *args, **kwargs):
     if not instance.name:
         instance.name = str(instance.target_start)
+

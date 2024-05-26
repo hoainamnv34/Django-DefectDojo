@@ -25,7 +25,7 @@ from django.db.models.signals import post_save
 from django.db.models.query import QuerySet
 import calendar as tcalendar
 from dojo.github import add_external_issue_github, update_external_issue_github, close_external_issue_github, reopen_external_issue_github
-from dojo.models import Finding, Engagement, Finding_Group, Finding_Template, Product, \
+from dojo.models import Engagement_Evaluate, Finding, Engagement, Finding_Group, Finding_Template, Product, \
     Test, User, Dojo_User, System_Settings, Notifications, Endpoint, Benchmark_Type, \
     Language_Type, Languages, Dojo_Group_Member, NOTIFICATION_CHOICES
 from asteval import Interpreter
@@ -1746,6 +1746,17 @@ def engagement_post_Save(sender, instance, created, **kwargs):
         title = 'Engagement created for ' + str(engagement.product) + ': ' + str(engagement.name)
         create_notification(event='engagement_added', title=title, engagement=engagement, product=engagement.product,
                             url=reverse('view_engagement', args=(engagement.id,)))
+
+
+@receiver(post_save, sender=Engagement_Evaluate)
+def update_engagement_is_successful(sender, instance, **kwargs):
+    try:
+        engagements = Engagement.objects.filter(engagement_evaluate=instance).all()
+        for engagement in engagements:
+            engagement.is_successful = engagement.evaluate_cicd_result()
+            engagement.save()
+    except Engagement.DoesNotExist:
+        pass
 
 
 def is_safe_url(url):

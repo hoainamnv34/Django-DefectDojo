@@ -27,14 +27,14 @@ from django.views import View
 from dojo.templatetags.display_tags import asvs_calc_level
 from dojo.filters import ProductEngagementFilter, ProductFilter, EngagementFilter, MetricsEndpointFilter, \
     MetricsFindingFilter, ProductComponentFilter
-from dojo.forms import ProductForm, EngForm, DeleteProductForm, DojoMetaDataForm, JIRAProjectForm, JIRAFindingForm, \
+from dojo.forms import DeleteEngagementEvaluateForm, EngagementEvaluateForm, ProductForm, EngForm, DeleteProductForm, DojoMetaDataForm, JIRAProjectForm, JIRAFindingForm, \
     AdHocFindingForm, \
     EngagementPresetsForm, DeleteEngagementPresetsForm, ProductNotificationsForm, \
     GITHUB_Product_Form, GITHUBFindingForm, AppAnalysisForm, JIRAEngagementForm, Add_Product_MemberForm, \
     Edit_Product_MemberForm, Delete_Product_MemberForm, Add_Product_GroupForm, Edit_Product_Group_Form, \
     Delete_Product_GroupForm, SLA_Configuration, \
     DeleteAppAnalysisForm, Product_API_Scan_ConfigurationForm, DeleteProduct_API_Scan_ConfigurationForm
-from dojo.models import Product_Type, Note_Type, Finding, Product, Engagement, Test, GITHUB_PKey, \
+from dojo.models import Engagement_Evaluate, Product_Type, Note_Type, Finding, Product, Engagement, Test, GITHUB_PKey, \
     Test_Type, System_Settings, Languages, App_Analysis, Benchmark_Product_Summary, Endpoint_Status, \
     Endpoint, Engagement_Presets, DojoMeta, Notifications, BurpRawRequestResponse, Product_Member, \
     Product_Group, Product_API_Scan_Configuration
@@ -1524,6 +1524,101 @@ def delete_engagement_presets(request, pid, eid):
 
     product_tab = Product_Tab(prod, title=_("Delete Engagement Preset"), tab="settings")
     return render(request, 'dojo/delete_presets.html',
+                  {'product': product,
+                   'form': form,
+                   'product_tab': product_tab,
+                   'rels': rels,
+                   })
+
+
+
+@user_is_authorized(Product, Permissions.Product_View, 'pid')
+def engagement_evaluate(request, pid):
+    prod = get_object_or_404(Product, id=pid)
+    evalates = Engagement_Evaluate.objects.filter(product=prod).all()
+
+    product_tab = Product_Tab(prod, title=_("Engagement Evaluation"), tab="settings")
+
+    return render(request, 'dojo/view_evaluate.html',
+                  {'product_tab': product_tab,
+                   'evaluates': evalates,
+                   'prod': prod})
+
+
+@user_is_authorized(Product, Permissions.Product_Edit, 'pid')
+def edit_engagement_evaluate(request, pid, eid):
+    prod = get_object_or_404(Product, id=pid)
+    evalate = get_object_or_404(Engagement_Evaluate, id=eid)
+
+    product_tab = Product_Tab(prod, title=_("Edit Engagement Evaluation"), tab="settings")
+
+    if request.method == 'POST':
+        tform = EngagementEvaluateForm(request.POST, instance=evalate)
+        if tform.is_valid():
+            tform.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _('Engagement Evaluation Successfully Updated.'),
+                extra_tags='alert-success')
+            return HttpResponseRedirect(reverse('engagement_evaluate', args=(pid,)))
+    else:
+        tform = EngagementEvaluateForm(instance=evalate)
+
+    return render(request, 'dojo/edit_evaluate.html',
+                  {'product_tab': product_tab,
+                   'tform': tform,
+                   'prod': prod})
+
+
+@user_is_authorized(Product, Permissions.Product_Edit, 'pid')
+def add_engagement_evaluate(request, pid):
+    prod = get_object_or_404(Product, id=pid)
+    if request.method == 'POST':
+        logger.debug("test1234")
+        tform = EngagementEvaluateForm(request.POST)
+        if tform.is_valid():
+            form_copy = tform.save(commit=False)
+            form_copy.product = prod
+            form_copy.save()
+            tform.save_m2m()
+            logger.debug("test123")
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                _('Engagement Evaluation Successfully Created.'),
+                extra_tags='alert-success')
+            return HttpResponseRedirect(reverse('engagement_evaluate', args=(pid,)))
+    else:
+        tform = EngagementEvaluateForm()
+
+    product_tab = Product_Tab(prod, title=_("New Engagement Evaluation"), tab="settings")
+    return render(request, 'dojo/new_evaluate.html', {'tform': tform, 'pid': pid, 'product_tab': product_tab})
+
+
+@user_is_authorized(Product, Permissions.Product_Edit, 'pid')
+def delete_engagement_evaluate(request, pid, eid):
+    prod = get_object_or_404(Product, id=pid)
+    evalate = get_object_or_404(Engagement_Evaluate, id=eid)
+    form = DeleteEngagementEvaluateForm(instance=evalate)
+
+    if request.method == 'POST':
+        if 'id' in request.POST:
+            form = DeleteEngagementEvaluateForm(request.POST, instance=evalate)
+            if form.is_valid():
+                evalate.delete()
+                messages.add_message(request,
+                                     messages.SUCCESS,
+                                     _('Engagement Evaluation and engagement relationships removed.'),
+                                     extra_tags='alert-success')
+                return HttpResponseRedirect(reverse('engagement_evaluate', args=(pid,)))
+
+    collector = NestedObjects(using=DEFAULT_DB_ALIAS)
+    collector.collect([evalate])
+    rels = collector.nested()
+
+    product_tab = Product_Tab(prod, title=_("Delete Engagement Evaluation"), tab="settings")
+    return render(request, 'dojo/delete_evaluate.html',
                   {'product': product,
                    'form': form,
                    'product_tab': product_tab,

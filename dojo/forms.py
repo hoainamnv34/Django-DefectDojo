@@ -25,7 +25,7 @@ import tagulous
 
 from dojo.endpoint.utils import endpoint_get_or_create, endpoint_filter, \
     validate_endpoints_to_add
-from dojo.models import Announcement, Finding, Finding_Group, Product_Type, Product, Note_Type, \
+from dojo.models import Announcement, Engagement_Evaluate, Finding, Finding_Group, Product_Type, Product, Note_Type, \
     Check_List, SLA_Configuration, User, Engagement, Test, Test_Type, Notes, Risk_Acceptance, \
     Development_Environment, Dojo_User, Endpoint, Stub_Finding, Finding_Template, \
     JIRA_Issue, JIRA_Project, JIRA_Instance, GITHUB_Issue, GITHUB_PKey, GITHUB_Conf, UserContactInfo, Tool_Type, \
@@ -907,7 +907,7 @@ class EngForm(forms.ModelForm):
         model = Engagement
         exclude = ('first_contacted', 'real_start', 'engagement_type', 'inherited_tags',
                    'real_end', 'requester', 'reason', 'updated', 'report_type',
-                   'product', 'threat_model', 'api_test', 'pen_test', 'check_list')
+                   'product', 'threat_model', 'api_test', 'pen_test', 'check_list', 'is_successful')
 
 
 class DeleteEngagementForm(forms.ModelForm):
@@ -2612,12 +2612,26 @@ class EngagementPresetsForm(forms.ModelForm):
         exclude = ['product']
 
 
+class EngagementEvaluateForm(forms.ModelForm):
+    class Meta:
+        model = Engagement_Evaluate
+        exclude = ['product']
+
+
 class DeleteEngagementPresetsForm(forms.ModelForm):
     id = forms.IntegerField(required=True,
                             widget=forms.widgets.HiddenInput())
 
     class Meta:
         model = Engagement_Presets
+        fields = ['id']
+
+class DeleteEngagementEvaluateForm(forms.ModelForm):
+    id = forms.IntegerField(required=True,
+                            widget=forms.widgets.HiddenInput())
+
+    class Meta:
+        model = Engagement_Evaluate
         fields = ['id']
 
 
